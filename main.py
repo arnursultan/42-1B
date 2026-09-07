@@ -28,7 +28,7 @@ dp = Dispatcher()
 router = Router()
 
 
-# здесь сделали кнопки для бота
+# Здесь сделали кнопки для бота.
 main_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [
@@ -49,7 +49,7 @@ async def start(message: Message):
         f"Здравствуй, {message.from_user.first_name}!👋🏼\n"
         "Я дежурный бот Серверной комнаты.\n"
         "Все системы (кроме моей мотивации) в норме.",
-        reply_markup=main_keyboard  # показываем кнопки пользователю
+        reply_markup=main_keyboard  # Показываем кнопки пользователю.
     )
 
 
@@ -63,7 +63,7 @@ async def help(message: Message):
     )
 
 
-# сделали команду для проверки серверов
+# Сделали команду для проверки серверов.
 @router.message(Command("status"))
 async def status(message: Message):
     await message.answer(
@@ -73,7 +73,7 @@ async def status(message: Message):
     )
 
 
-# сделали команду для шутки
+# Сделали команду для шутки.
 @router.message(Command("joke"))
 async def joke(message: Message):
     await message.answer(
@@ -82,25 +82,25 @@ async def joke(message: Message):
     )
 
 
-# привязали кнопку к статусу
+# Привязали кнопку к статусу.
 @router.message(lambda m: m.text == "📊 Статус")
 async def button_status(message: Message):
     await status(message)
 
 
-# привязали кнопку к шутке
+# Привязали кнопку к шутке.
 @router.message(lambda m: m.text == "😂 Шутка")
 async def button_joke(message: Message):
     await joke(message)
 
 
-# привязали кнопку к помощи
+# Привязали кнопку к помощи.
 @router.message(lambda m: m.text == "🆘 Помощь")
 async def button_help(message: Message):
     await help(message)
 
 
-# сюда попадает всё, что бот не понял
+# Сюда попадает всё, что бот не понял.
 @router.message()
 async def echo_all(message: Message):
     await message.answer(
@@ -120,3 +120,4 @@ if __name__ == "__main__":
 
 # В итоге сделали команды, кнопки и обработку непонятных сообщений.
 # Теперь бот стал удобнее и умеет больше.
+# Такие дела, обязательно попробуйте у себя локально данный код.
