@@ -46,4 +46,4 @@ INSERT INTO incidents (description, server_id) VALUES ('диск заполне�
 .tables — список таблиц в базе
 .schema servers — структура конкретной таблицы
 .mode column — красивый вывод таблицами
-.headers on — показывать названия столбцов
+.headers on — показывать названия столбцов—
