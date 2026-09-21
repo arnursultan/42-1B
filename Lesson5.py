@@ -36,18 +36,64 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.memory import MemoryStorage
 
-import Lesson5_db
+import db
 
 load_dotenv()
 bot = Bot(token=os.getenv("BOT_TOKEN"))
 dp = Dispatcher(storage=MemoryStorage())
 router = Router()
 
+confirm_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="✅ Сохранить", callback_data="confirm_save")],
+    [InlineKeyboardButton(text="❌ Отмена", callback_data="confirm_cancel")],
+])
 
+class AddServerStates(StatesGroup):
+    waiting_for_name = State()
+    waiting_for_type = State()
+    waiting_for_status = State()
 
+@router.message(Command("add_server"))
+async def add_server(message: Message, state: FSMContext):
+    await message.answer("Введите имя нового сервера:")
+    await state.set_state(AddServerStates.waiting_for_name)
 
+@router.message(AddServerStates.waiting_for_name)
+async def process_name(message: Message, state: FSMContext):
+    await state.update_data(name=message.text)
+    await message.answer("Тип сервера (web / db / backup):")
+    await state.set_state(AddServerStates.waiting_for_type)
 
+@router.message(AddServerStates.waiting_for_type)
 
+async def process_type(message: Message, state: FSMContext):
+    await state.update_data(type=message.text)
+    await message.answer("Статус (жив / мёртв / в отпуске):")
+    await state.set_sate(AddServerStates.waiting_for_status)
 
+@router.message(AddServerStates.waiting_for_status)
+async def process_status(message: Message, state: FSMContext):
+    data = await state.update_data(status=message.text)
+    await message.answer(
+        f"Проверьте:\nИмя:{data['name']}\nТип: {data['type']}\nСтатус:{data['status']}",
+        reply_markup = confirm_keyboard
+    )
 
+@router.callback_query(F.data == "confirm_save")
+async def confirm_save(callback: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    try:
+        db.add_server(data["name"], data["type"], data["status"])
+        await callback.message.edit_text("Сервер сохранён в реестре ✅")
+    except Exception:
+        await callback.message.edit_text("Сервер с таким именем уже существует ⚠️")
+        await state.clear()
+        await callback.answer()
 
+@router.callback_query(F.data == "confirm_cancel")
+async def confirm_cancel(callback: CallbackQuery, state: FSMContext):
+    await state.clear()
+    await callback.message.edit_text("Добавление отменено ❌")
+    await callback.answer()
+
+@router.message(Command("list_servers")
