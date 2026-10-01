@@ -16,12 +16,12 @@ dp = Dispatcher()
 dp.include_router(router)
 
 
-@app.get("/")
+@app.get("/api/index")
 async def health():
     return {"status": "дежурный на посту"}
 
 
-@app.post("/api/webhook")
+@app.post("/api/index")
 async def webhook(
     request: Request,
     x_telegram_bot_api_secret_token: str = Header(default=""),
