@@ -24,9 +24,9 @@
 #
 # DELETE FROM servers WHERE name = "mail_server"
 
-import asyncio
 import os
 from dotenv import load_dotenv
+from fastapi import FastAPI, Request
 
 from aiogram import Bot, Dispatcher, Router, F
 from aiogram.filters import Command
@@ -34,7 +34,8 @@ from aiogram.types import (
     Message,
     CallbackQuery,
     InlineKeyboardButton,
-    InlineKeyboardMarkup
+    InlineKeyboardMarkup,
+    Update
 )
 
 from aiogram.fsm.state import State, StatesGroup
@@ -50,6 +51,9 @@ bot = Bot(token=os.getenv("BOT_TOKEN"))
 dp = Dispatcher(storage=MemoryStorage())
 router = Router()
 
+app = FastAPI()
+
+db.init_db()
 
 confirm_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
@@ -247,12 +251,30 @@ async def start(message: Message):
         "/delete_server имя — удалить"
     )
 
+dp.include_router(router)
 
-async def main():
-    db.init_db()
-    dp.include_router(router)
-    await dp.start_polling(bot)
+@app.get("/api/health")
+async def health():
+    return {
+        "status": "Окей",
+        "message": "Телеграм Бот запущен."
+    }
 
+@app.post("/api/webhook")
+async def webhook(request: Request):
+    data = await request.json()
 
-if __name__ == "__main__":
-    asyncio.run(main())
+    bot = Bot(token=os.getenv("BOT_TOKEN"))
+
+    try:
+        update = Update.model_validate(
+            data,
+            context={"bot":bot}
+        )
+
+        await dp.feed_update(bot, update)
+
+        return {"ok":True}
+
+    finally:
+        await bot.session.close()

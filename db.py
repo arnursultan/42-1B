@@ -1,6 +1,6 @@
 import sqlite3
 
-DB_NAME = "tg_bot.db"
+DB_NAME = "/tmp/tg_bot.db"
 
 
 def get_connection():
