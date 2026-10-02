@@ -1,6 +1,6 @@
 import sqlite3
 
-DB_NAME = "tg_bot.db"
+DB_NAME = "/tmp/database.db"
 
 
 def get_connection():
@@ -14,18 +14,14 @@ def init_db():
         conn.execute("""
             CREATE TABLE IF NOT EXISTS servers (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL UNIQUE,
+                name TEXT UNIQUE NOT NULL,
                 type TEXT NOT NULL,
-                status TEXT NOT NULL DEFAULT 'жив'
+                status TEXT NOT NULL
             )
         """)
 
 
-def add_server(
-    name: str,
-    server_type: str,
-    status: str = "жив"
-) -> bool:
+def add_server(name, server_type, status):
     try:
         with get_connection() as conn:
             conn.execute(
@@ -35,42 +31,28 @@ def add_server(
                 """,
                 (name, server_type, status)
             )
-        return True
+            conn.commit()
+            return True
     except sqlite3.IntegrityError:
         return False
 
 
 def get_all_servers():
     with get_connection() as conn:
-        rows = conn.execute(
-            """
-            SELECT id, name, type, status
-            FROM servers
-            ORDER BY id
-            """
+        return conn.execute(
+            "SELECT * FROM servers ORDER BY id"
         ).fetchall()
 
-    return rows
 
-
-def get_server_by_name(name: str):
+def get_server_by_name(name):
     with get_connection() as conn:
-        row = conn.execute(
-            """
-            SELECT id, name, type, status
-            FROM servers
-            WHERE name = ?
-            """,
+        return conn.execute(
+            "SELECT * FROM servers WHERE name = ?",
             (name,)
         ).fetchone()
 
-    return row
 
-
-def update_server_status(
-    name: str,
-    new_status: str
-) -> bool:
+def update_server_status(name, status):
     with get_connection() as conn:
         cursor = conn.execute(
             """
@@ -78,20 +60,17 @@ def update_server_status(
             SET status = ?
             WHERE name = ?
             """,
-            (new_status, name)
+            (status, name)
         )
+        conn.commit()
+        return cursor.rowcount > 0
 
-    return cursor.rowcount > 0
 
-
-def delete_server(name: str) -> bool:
+def delete_server(name):
     with get_connection() as conn:
         cursor = conn.execute(
-            """
-            DELETE FROM servers
-            WHERE name = ?
-            """,
+            "DELETE FROM servers WHERE name = ?",
             (name,)
         )
-
-    return cursor.rowcount > 0
+        conn.commit()
+        return cursor.rowcount > 0
