@@ -40,9 +40,12 @@ from aiogram.types import (
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.memory import MemoryStorage
+from fastapi import FastAPI, Request
+from aiogram.types import Update
 
 import db
 
+app = FastAPI()
 
 load_dotenv()
 
@@ -50,6 +53,8 @@ bot = Bot(token=os.getenv("BOT_TOKEN"))
 dp = Dispatcher(storage=MemoryStorage())
 router = Router()
 
+dp.include_router(router)
+db.init_db()
 
 confirm_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
@@ -248,11 +253,26 @@ async def start(message: Message):
     )
 
 
-async def main():
-    db.init_db()
-    dp.include_router(router)
-    await dp.start_polling(bot)
+@app.get("/api/health")
+async def health():
+    return {"status": "ok"}
 
 
-if __name__ == "__main__":
-    asyncio.run(main())
+@app.post("/api/webhook")
+async def webhook(request: Request):
+    data = await request.json()
+
+    bot = Bot(token=os.getenv("BOT_TOKEN"))
+
+    try:
+        update = Update.model_validate(
+            data,
+            context={"bot": bot}
+        )
+
+        await dp.feed_update(bot, update)
+
+        return {"ok": True}
+
+    finally:
+        await bot.session.close()
