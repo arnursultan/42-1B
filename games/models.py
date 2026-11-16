@@ -87,9 +87,9 @@ class Game(models.Model):
         verbose_name = "Игра"
         verbose_name_plural = "Игры"
         indexes = [
-            models.index(fields=["genre"], name="name_genre_idx"),
-            models.index(fields=["released"], name="game_released_idx"),
-            models.index(fields=["rating"], name="game_rating_idx")
+            models.Index(fields=["genre"], name="name_genre_idx"),
+            models.Index(fields=["released"], name="game_released_idx"),
+            models.Index(fields=["rating"], name="game_rating_idx")
         ]
     def __str__(self):
         return self.title
