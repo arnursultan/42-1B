@@ -53,6 +53,7 @@ class GameListAPIView(APIView):
         logger.warning("Ошибка валидации при создании игры: %s", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class GameDetailAPIView(APIView):
     def get_object(self, pk):
         queryset = Game.objects.select_related("developer").prefetch_related("platforms")
