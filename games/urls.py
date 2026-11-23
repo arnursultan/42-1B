@@ -11,7 +11,7 @@ router.register(
 )
 
 urlpatterns = [
-    path('plain/',           views.games_plain_django),
-    path('hello/',           views.HelloAPIView.as_view()),
-    path('', include(router.urls)),
+    path('plain/',  views.games_plain_django),
+    path('hello/',  views.HelloAPIView.as_view()),
+    path('',        include(router.urls)),
 ]
