@@ -8,7 +8,9 @@
 # 300 — Коды перенаправления
 # 400 — Ошибка клиента
 # 500 — Ошибки сервера
+from rest_framework.filters import OrderingFilter
 from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView
+from rest_framework.routers import SimpleRouter
 
 # CBV — Class-Based-Views — это представления, реализованные в виде Python классов. В DRF они исспользуются для обработки HTTP запросов
 # FBV — Function-Based-Views — это представление, где логика обработки запроса находится внутри функции.
@@ -41,3 +43,21 @@ from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIVie
 # /api/projects/1/ — конкретный проект
 # /api/projects/1/tasks/ — задачи определенного игры.
 # /api/projects/1/tasks/1/ — конкретная задача внутри игры
+
+# Пагинация — PAGINATION
+# Виды:
+# 1.PageNumberPagination
+# 2.LimitOffsetPagination
+# 3.CursorPAgination
+#
+# Фильтрация:
+# 1. DjangoFilterBackend
+# 2. SearchFilter
+# 3. OrderingFilter
+#
+# Router:
+# 1. SimpleRouter
+# 2. DefaultRouter
+# @action
+# default=False — это действие над коллекцией объектов
+# default=True — это действие над конкретным объектов
