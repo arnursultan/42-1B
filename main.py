@@ -1,63 +1,89 @@
-# API — Application Programming Interface
-# REST — Набор правил для проектирования такого официанта.
-# /api/coffee
-# /api/coffee/5
-# JSON — JavaScript Object Notation — это текстовый формат обмена структурированными данными.
-# 100 — Информационные ответы
-# 200 — Успешные ответы
-# 300 — Коды перенаправления
-# 400 — Ошибка клиента
-# 500 — Ошибки сервера
-from rest_framework.filters import OrderingFilter
-from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView
-from rest_framework.routers import SimpleRouter
+# API — Application Programming Interface — интерфейс взаимодействия между программами.
+# REST — архитектурный стиль проектирования API, который определяет правила работы с ресурсами.
 
-# CBV — Class-Based-Views — это представления, реализованные в виде Python классов. В DRF они исспользуются для обработки HTTP запросов
-# FBV — Function-Based-Views — это представление, где логика обработки запроса находится внутри функции.
-# Отличия CBV от FBV, в том что CBV она разделяет логику на отдельные методы класса.
-# APIView — базовы класс DRF для создания представлений на основе классов
-# GenericAPIView — это расширенный базовый класс DRF, предназначенный для работы с моделями, QuerySet и serializers.
-# Generic Views — это готовые классы пресдтавлений, созданные на основе GenericAPIView и Mixins.
-#               Основные виды Generic Views:
-# ListAPIView                     — Получение списка объектов
-# RetrieveAPIView                 — Получение одного объекта
-# CreateAPIView                   — Создание объекта
-# UpdateAPIView                   — Обновление объекта
-# DestroyAPIView                  — Удаление объекта
-# ListCreateAPIView               — Получение списка и создание
-# RetrieveUpdateAPIView           — Получение и обновление
-# RetrieveDestroyAPIView          — Получение и удаление
-# RetrieveUpdateDestroyAPiView    — Получение, обновление и удаление
+# /api/coffee/       — получение списка кофе
+# /api/coffee/5/     — получение конкретного объекта
+
+# JSON — JavaScript Object Notation — текстовый формат обмена структурированными данными.
+
+# HTTP STATUS CODES:
+# 1xx — Информационные ответы
+# 2xx — Успешные ответы
+# 3xx — Перенаправление
+# 4xx — Ошибки на стороне клиента
+# 5xx — Ошибки на стороне сервера
+
+# CBV — Class-Based Views — представления, реализованные в виде Python-классов.
+# В DRF используются для обработки HTTP-запросов через методы класса.
+
+# FBV — Function-Based Views — представления, реализованные в виде Python-функций.
+# Вся логика обработки запроса находится внутри функции.
+
+# Главное отличие:
+# FBV — обработка запросов через функции.
+# CBV — обработка запросов через методы класса.
+
+# APIView — базовый класс DRF для создания представлений на основе классов.
+
+# GenericAPIView — расширенный класс DRF для работы с моделями, QuerySet и сериализаторами.
+
+# Generic Views — готовые представления на основе GenericAPIView и Mixins.
+
+# Основные Generic Views:
+# ListAPIView                    — получение списка объектов
+# RetrieveAPIView                — получение одного объекта
+# CreateAPIView                  — создание объекта
+# UpdateAPIView                  — обновление объекта
+# DestroyAPIView                 — удаление объекта
+# ListCreateAPIView              — получение списка и создание объекта
+# RetrieveUpdateAPIView          — получение и обновление объекта
+# RetrieveDestroyAPIView         — получение и удаление объекта
+# RetrieveUpdateDestroyAPIView   — получение, обновление и удаление объекта
 
 # Основные виды Mixins:
-# ListModelMixin      — Получение списка объектов
-# RetrieveModelMixin  — Получение одного объекта
-# CreateModelMixin    — Создание
-# UpdateModelMixin    — Обновление
-# DestroyModelMixin   — Удаление
+# ListModelMixin      — получение списка объектов
+# RetrieveModelMixin  — получение одного объекта
+# CreateModelMixin    — создание объекта
+# UpdateModelMixin    — обновление объекта
+# DestroyModelMixin   — удаление объекта
 
-# Вложенные маршруты — Nested Routes
-# Это способ организации URL—адресов, при котором один ресурс располагается внутри друого ресурса.
-#
-# /api/projects — список игр
-# /api/projects/1/ — конкретный проект
-# /api/projects/1/tasks/ — задачи определенного игры.
-# /api/projects/1/tasks/1/ — конкретная задача внутри игры
+# Вложенные маршруты — Nested Routes.
+# Способ организации URL, при котором один ресурс находится внутри другого.
 
-# Пагинация — PAGINATION
-# Виды:
-# 1.PageNumberPagination
-# 2.LimitOffsetPagination
-# 3.CursorPAgination
-#
-# Фильтрация:
-# 1. DjangoFilterBackend
-# 2. SearchFilter
-# 3. OrderingFilter
-#
-# Router:
-# 1. SimpleRouter
-# 2. DefaultRouter
-# @action
-# default=False — это действие над коллекцией объектов
-# default=True — это действие над конкретным объектов
+# /api/projects/             — список проектов
+# /api/projects/1/           — конкретный проект
+# /api/projects/1/tasks/     — список задач проекта
+# /api/projects/1/tasks/1/   — конкретная задача проекта
+
+# Пагинация — Pagination.
+# Разделение большого списка объектов на отдельные страницы.
+
+# Основные виды:
+# 1. PageNumberPagination  — пагинация по номеру страницы.
+# 2. LimitOffsetPagination — пагинация с использованием лимита и смещения.
+# 3. CursorPagination      — пагинация с использованием курсора.
+
+# Фильтрация и поиск:
+# 1. DjangoFilterBackend — фильтрация по определённым полям.
+# 2. SearchFilter        — поиск по текстовым полям.
+# 3. OrderingFilter      — сортировка объектов.
+
+# Router — автоматическое создание URL-маршрутов для ViewSet.
+
+# Основные виды:
+# 1. SimpleRouter — создаёт стандартные маршруты для ViewSet.
+# 2. DefaultRouter — аналог SimpleRouter, но дополнительно создаёт API Root.
+
+# @action — декоратор для создания дополнительных действий внутри ViewSet.
+
+# detail=False — действие над списком объектов.
+# detail=True  — действие над конкретным объектом.
+# Примеры:
+# @action(detail=False) — /api/projects/active/
+# @action(detail=True)  — /api/projects/1/archive/
+
+# CRUD — основные операции над данными:
+# Create — создание (POST)
+# Read   — получение (GET)
+# Update — обновление (PUT, PATCH)
+# Delete — удаление (DELETE)
