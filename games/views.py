@@ -1,11 +1,13 @@
 import logging
 import hashlib
+from decimal import Decimal, InvalidOperation
 
 from django.core.cache import cache
 from django.db.models import Prefetch
 from django.http import JsonResponse
 from rest_framework import filters, status, viewsets
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 
 from .models import Game, Platform
@@ -64,6 +66,17 @@ class GameViewSet(viewsets.ModelViewSet):
         if platform_id:
             queryset = queryset.filter(platforms__id=platform_id)
         return queryset.distinct()
+
+        min_rating = self.request.query_params.get("min_rating")
+        max_rating = self.request.query_params.get("max_rating")
+        if min_rating and not None or max_rating is not None:
+            try:
+                min_value = Decimal(min_rating) if min_rating is not None else None
+                max_value = Decimal(max_rating) if max_rating is not None else None
+            except InvalidOperation:
+                raise ValidationError({"rating": "Укажите число от 0 до 10."})
+
+            if any(value is not None and not value_is_finite() for value in (min_value, max_value)):
 
     def list(self, request, *args, **kwargs):
         return cached_response(request, lambda: super(GameViewSet, self).list(request, *args, **kwargs))
