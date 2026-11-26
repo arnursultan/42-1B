@@ -65,18 +65,29 @@ class GameViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(developer_id=developer_id)
         if platform_id:
             queryset = queryset.filter(platforms__id=platform_id)
-        return queryset.distinct()
 
         min_rating = self.request.query_params.get("min_rating")
         max_rating = self.request.query_params.get("max_rating")
-        if min_rating and not None or max_rating is not None:
+        if min_rating is not None or max_rating is not None:
             try:
                 min_value = Decimal(min_rating) if min_rating is not None else None
                 max_value = Decimal(max_rating) if max_rating is not None else None
             except InvalidOperation:
                 raise ValidationError({"rating": "Укажите число от 0 до 10."})
 
-            if any(value is not None and not value_is_finite() for value in (min_value, max_value)):
+            if any(value is not None and not value.is_finite() for value in (min_value, max_value)):
+                raise ValidationError({"rating": "Укажите конечное число от 0 до 10."})
+            if any(value is not None and not Decimal("0") <= value <= Decimal("10")
+                   for value in (min_value, max_value)):
+                raise ValidationError({"rating": "Рейтинг должен быть от 0 до 10."})
+            if min_value is not None and max_value is not None and min_value > max_value:
+                raise ValidationError({"rating": "min_rating не может быть больше max_rating."})
+
+            if min_value is not None:
+                queryset = queryset.filter(rating__gte=min_value) # GTE — Greater Than or Equal
+            if max_value is not None:
+                queryset = queryset.filter(rating__lte=max_value) # LTE — Less Than or Equal
+        return queryset.distinct()
 
     def list(self, request, *args, **kwargs):
         return cached_response(request, lambda: super(GameViewSet, self).list(request, *args, **kwargs))
